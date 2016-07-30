@@ -1035,18 +1035,7 @@ function BasicAuthorization(config, backend, appKey) {
 
     var currentToken = "Basic " + basicAuth.getAnonymousToken();
 
-console.log('anon call to ', basicAuth.backend.getPlatformUrl("users/login"));
-console.log('auth:', basicAuth.getAnonymousToken());
-console.log('backend:', basicAuth.getBackendId());
-console.log('key:', basicAuth.getApplicationKey());
-
- basicAuth.setIsAuthorized(true);
-        basicAuth.setIsAnonymous(true);
-        basicAuth.setAnonymousAccessToken(currentToken);
-                  successCallback(200, '');
-
-
-   /* mcs.MobileBackendManager.platform.invokeService({
+    mcs.MobileBackendManager.platform.invokeService({
       url: basicAuth.backend.getPlatformUrl("users/login"),
       method: 'GET',
       headers: {
@@ -1055,7 +1044,6 @@ console.log('key:', basicAuth.getApplicationKey());
         "Oracle-Mobile-Application-Key": basicAuth.getApplicationKey()
       },
       success: function (response, data) {
-        console.log('user logged in anon');
         mcs._Logger.log(mcs.logLevelInfo, "User logged in anonymously " + response.status);
         basicAuth.setIsAuthorized(true);
         basicAuth.setIsAnonymous(true);
@@ -1067,7 +1055,6 @@ console.log('key:', basicAuth.getApplicationKey());
       },
 
       error: function(statusCode, data) {
-        console.log('failed', statusCode);
         mcs._Logger.log(mcs.logLevelError,  "Login failed with error: " + statusCode);
 
         clearState();
@@ -1076,7 +1063,7 @@ console.log('key:', basicAuth.getApplicationKey());
           errorCallback(statusCode, data);
         }
       }
-    });*/
+    });
   };
 
 
@@ -1893,13 +1880,6 @@ function CustomCode(backend){
     var customData = JSON.stringify(data);
     headers["Content-Length"] = customData.length;
 
-console.log('call', customCode.backend.getCustomCodeUrl(path));
-console.log(headers.length);
-for (var key in headers) {
-  console.log('headers', key, headers[key]);
-};
-console.log(customData);
-console.log('method', method);
     mcs.MobileBackendManager.platform.invokeService({
       method: method,
       url: customCode.backend.getCustomCodeUrl(path),
@@ -1912,8 +1892,33 @@ console.log('method', method);
         }
       },
       error: function(statusCode, data) {
-        console.log('statusCode', statusCode);
-        console.log(data);
+        if(errorCallback != null) {
+          errorCallback(statusCode, data);
+        }
+      }
+    });
+  }
+
+   this.invokeLocationAPI = function(path,method,data,successCallback,errorCallback){
+
+    var headers = customCode.backend.getHttpHeaders();
+    headers["Content-Type"] = 'application/json';
+
+    var customData = JSON.stringify(data);
+    headers["Content-Length"] = customData.length;
+
+    mcs.MobileBackendManager.platform.invokeService({
+      method: method,
+      url: customCode.backend.getPlatformUrl(path),
+      headers: headers,
+      body: customData,
+
+      success: function (response,data) {
+        if (successCallback != null) {
+          successCallback(response.status,data);
+        }
+      },
+      error: function(statusCode, data) {
         if(errorCallback != null) {
           errorCallback(statusCode, data);
         }

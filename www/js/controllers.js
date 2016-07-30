@@ -11,7 +11,7 @@ angular.module('starter.controllers', ['app.services', 'ngCordova'])
   //$scope.$on('$ionicView.enter', function(e) {
   //});
 
-  mcsService.authenticateAnonymous();
+  //mcsService.authenticateAnonymous();
 
 
   // Form data for the login modal
@@ -64,6 +64,7 @@ angular.module('starter.controllers', ['app.services', 'ngCordova'])
 
 .controller('MapCtrl', function($scope, $cordovaGeolocation, $ionicLoading, $ionicPlatform, $ionicModal, mcsService) {
 
+  var lat, lon;
   //init the modal
   $ionicModal.fromTemplateUrl('modal.html', {
     scope: $scope,
@@ -72,7 +73,7 @@ angular.module('starter.controllers', ['app.services', 'ngCordova'])
     $scope.modal = modal;
   });
 
-  // function to open the modal
+  // They are looking at an animal
   $scope.openModal = function (id) {
     $ionicLoading.show({
       template: '<ion-spinner icon="bubbles"></ion-spinner><br/>Getting information'
@@ -82,6 +83,10 @@ angular.module('starter.controllers', ['app.services', 'ngCordova'])
       $ionicLoading.hide();                          
       $scope.modal.animal = data;
       $scope.modal.show();
+      mcsService.logCustomEvent('ViewAnimal',{
+        animal:data.name
+      });
+      mcsService.flushAnalyticsEvents();
     })
     .catch(function(err) {
       $ionicLoading.hide();                          
@@ -116,8 +121,23 @@ angular.module('starter.controllers', ['app.services', 'ngCordova'])
       var image = 'img/ff000.png';      
 
       $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
-          var lat  = position.coords.latitude;
-          var lon = position.coords.longitude;
+          lat  = position.coords.latitude;
+          lon = position.coords.longitude;
+          mcsService.setLatLon(String(lat), String(lon));
+          mcsService.invokeLocationAPI("location/places/query", "POST", {
+            inGeoFence: {
+              gpsCircle : {
+                latitude  : lat,
+                longitude : lon,
+                radius    : 2000
+              }
+            },
+            limit : 1 
+          }).then(function (data) {
+            console.log('data', data);
+          }).catch(function(err) {
+            console.log("Error calling places api" + err);
+          });
           mcsService.invokeCustomAPI("Animals/animals/nearby?lat=" + lat + "&lon=" + lon , "GET" , null)
           .then (function(data) {
             if (data.length > 0) {
