@@ -104,7 +104,7 @@ angular.module('starter.controllers', ['app.services', 'ngCordova'])
       $scope.nearby_title = "Nothing nearby";
       $scope.nearby_class = "bar-stable";
       $ionicLoading.show({
-          template: '<ion-spinner icon="bubbles"></ion-spinner><br/>Acquiring location!'
+          template: '<ion-spinner icon="bubbles"></ion-spinner><br/>Keep your eyes open, <br/>you might miss something!'
       });
        
       var posOptions = {
