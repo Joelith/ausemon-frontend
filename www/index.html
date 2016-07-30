@@ -26,6 +26,24 @@
     <script src="js/controllers.js"></script>
     <script src="js/services.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIuwyAYxht0OJaofeKldLypiVk7fK6_Go"></script>
+    
+    <script type="text/ng-template" id="modalWrapper.html">
+      <ion-modal-view id="modal"class="modal"></ion-modal-view>
+    </script>
+
+    <script type="text/ng-template" id="modalOne.html">
+          <ion-header-bar class="bar-positive" align-title="center">
+            <h1 class="title">Modal Header</h1>
+            <a class="button" ng-click="closeModal()">Cancel</a>
+          </ion-header-bar>
+          <ion-content>
+            <h4 class="title">Modal Content</h4>
+          </ion-content>
+          <ion-footer-bar class="bar-positive" align-title="center">
+            <h1 class="title">Modal Footer</h1>
+          </ion-footer-bar>
+    </script> 
+       
   </head>
 
   <body ng-app="starter">

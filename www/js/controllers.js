@@ -68,55 +68,107 @@ angular.module('starter.controllers', ['app.services', 'ngCordova'])
   //  })
 
 })
-.controller('MapCtrl', function($scope, $state, $cordovaGeolocation) {
-  var options = {timeout: 10000, enableHighAccuracy: true};
 
-console.log($cordovaGeolocation.getCurrentPosition);
-  $cordovaGeolocation.getCurrentPosition(options).then(function(position){
-    console.log('postition');
-    console.log(position);
-    var latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+.controller('AnimalListCtrl2', function ($scope) {
+    $scope.animalListItems = [{
+        id: 1,
+        pretty_name: "Kangaroo"
+      },{
+        id:21,
+        pretty_name:"Wombat"
+      }];  
+})
 
-    var mapOptions = {
-        zoom: 13,
-        center: latLng,
-        streetViewControl: false,
-        draggable: false, 
-        zoomControl: false, 
-        scrollwheel: false, 
-        disableDoubleClickZoom: true,
-        clickableIcons: false,
-        disableDefaultUI : true,            
-        mapTypeId: 'terrain'
-    }; 
+.controller('AnimalListCtrl', function ($scope, $ionicModal) {
 
-    var image = 'img/ff000.png';
-    $scope.map = new google.maps.Map(document.getElementById("map"), mapOptions);
-    $scope.map.data.loadGeoJson('geo/cct1.geojson');
-    $scope.map.data.loadGeoJson('geo/cct2.geojson'); 
-console.log('loaded', $scope.map.data);
-    //Wait until the map is loaded
-    google.maps.event.addListenerOnce($scope.map, 'idle', function(){ 
-      var marker = new google.maps.Marker({
-          position: latLng,
-          map: $scope.map,
-          icon: image
-      });      
+// array list which will contain the items added
+$scope.animalListItems = [];
 
-      var infoWindow = new google.maps.InfoWindow({
-          content: "Here I am!"
-      });
-
-      google.maps.event.addListener(marker, 'click', function () {
-          infoWindow.open($scope.map, marker);
-      });
-
-    });
-
-  }, function(error){
-    console.log("Could not get location");
-  });
+//init the modal
+$ionicModal.fromTemplateUrl('modal.html', {
+  scope: $scope,
+  animation: 'slide-in-up'
+}).then(function (modal) {
+  $scope.modal = modal;
 });
 
+// function to open the modal
+$scope.openModal = function () {
+  $scope.modal.show();
+};
 
+// function to close the modal
+$scope.closeModal = function () {
+  $scope.modal.hide();
+};
 
+//Cleanup the modal when we're done with it!
+$scope.$on('$destroy', function () {
+  $scope.modal.remove();
+});
+
+$scope.animalListItems = [{
+    id: 1,
+    pretty_name: "Kangaroo"
+  },{
+    id:21,
+    pretty_name:"Wombat"
+  }];  
+
+})
+
+.controller('MapCtrl', function($scope, $cordovaGeolocation, $ionicLoading, $ionicPlatform, $ionicModal) {
+     
+    $ionicPlatform.ready(function() {
+         
+        $ionicLoading.show({
+            template: '<ion-spinner icon="bubbles"></ion-spinner><br/>Acquiring location!'
+        });
+         
+        var posOptions = {
+            enableHighAccuracy: true,
+            timeout: 20000,
+            maximumAge: 0
+        };  
+
+        var image = 'img/ff000.png';      
+
+        $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
+            var lat  = position.coords.latitude;
+            var long = position.coords.longitude;
+             
+            var latLong = new google.maps.LatLng(lat, long);
+             
+            var mapOptions = {
+                zoom: 25,
+                center: latLong,
+                streetViewControl: false,
+                draggable: false, 
+                zoomControl: false, 
+                scrollwheel: false, 
+                disableDoubleClickZoom: true,
+                clickableIcons: false,
+                disableDefaultUI : true,            
+                mapTypeId: 'terrain'
+            };                              
+             
+            var map = new google.maps.Map(document.getElementById("map"), mapOptions);          
+             
+            $scope.map = map;
+            $scope.map.data.loadGeoJson('geo/cct1.geojson');
+            $scope.map.data.loadGeoJson('geo/cct2.geojson');
+            
+            var marker = new google.maps.Marker({
+              position: latLong,
+              map: $scope.map,
+              icon: image
+            });                   
+            
+            $ionicLoading.hide();                          
+                  
+        }, function(err) {
+            $ionicLoading.hide();
+            console.log(err);
+        });
+    });               
+});

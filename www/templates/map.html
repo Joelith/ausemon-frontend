@@ -1,5 +1,42 @@
-<ion-view view-title="Map">
+<ion-view view-title="Ausémon - Gotta See 'Em All">
 	<ion-content>
 		<div id="map" data-tap-disabled="true"></div>
+	<div class="bar bar-footer bar-balanced">
+  		<div class="title">Something is near!</div>
+	</div>
+	<ion-list ng-controller="AnimalListCtrl">
+		<ion-item ng-repeat="item in animalListItems" ng-click="openModal({{item.id}})">
+			{{item.pretty_name}}
+		</ion-item>
+	</ion-list>			
 	</ion-content>
 </ion-view>
+<script id="modal.html" type="text/ng-template">
+<div class="modal">
+	<ion-header-bar class="bar-positive" align-title="center">
+						<h1 class="title">Modal Header</h1>
+						<a class="button" ng-click="closeModal()">Cancel</a>
+	</ion-header-bar>
+	<ion-content>
+		<div class="list card">
+
+		<div class="item item-avatar">
+			<img src="mcfly.jpg">
+			<h2>Marty McFly</h2>
+			<p>November 05, 1955</p>
+		</div>
+
+		<div class="item item-body">
+			<img class="full-image" src="delorean.jpg">
+			<p>
+			This is a "Facebook" styled Card. The header is created from a Thumbnail List item,
+			the content is from a card-body consisting of an image and paragraph text. The footer
+			consists of tabs, icons aligned left, within the card-footer.
+			</p>
+		</div>
+
+		</div>
+	</ion-content>
+</div>
+</div>
+</script>
