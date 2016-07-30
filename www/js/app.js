@@ -71,6 +71,15 @@ angular.module('starter', ['ionic', 'starter.controllers'])
       }
     }
   })
+  .state('app.badges', {
+    url: '/badges',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/badges.html',
+        controller: 'BadgesCtrl'
+      }
+    }
+  })
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/app/map');
 });

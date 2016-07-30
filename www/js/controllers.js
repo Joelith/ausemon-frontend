@@ -11,6 +11,9 @@ angular.module('starter.controllers', ['app.services', 'ngCordova'])
   //$scope.$on('$ionicView.enter', function(e) {
   //});
 
+  mcsService.authenticateAnonymous();
+
+
   // Form data for the login modal
   $scope.loginData = {};
 
@@ -44,131 +47,124 @@ angular.module('starter.controllers', ['app.services', 'ngCordova'])
 
 
 })
-.controller('animalsCtrl', function($scope,mcsService) {
-  console.log('animals Ctrl called');
-   //mcsService.authenticateAnonymous()
-   // .then(function() {
-
-      $scope.animals = [{
-        id: 1,
-        pretty_name: "Kangaroo",
-        description: "A marsupial"
-      },{
-        id:21,
-        pretty_name:"Wombat",
-        description: "Something"
-      }];
-    /*  mcsService.invokeCustomAPI("Animals/animals" , "GET" , null)
-      .then (function(data) {
-            $scope.animals = data;          
-      })
-      .catch(function(err) {
-          console.log('Error calling endpoint Animals/animals: '+err);
-      });     */
-  //  })
-
+.controller('animalsCtrl', function($scope,$ionicLoading,mcsService) {
+  $ionicLoading.show({
+    template: '<ion-spinner icon="bubbles"></ion-spinner><br/>Getting information'
+  });
+  mcsService.invokeCustomAPI("Animals/animals" , "GET" , null)
+  .then (function(data) {
+    $ionicLoading.hide();                          
+    $scope.animals = data.animals;          
+  })
+  .catch(function(err) {
+      $ionicLoading.hide();                          
+      console.log('Error calling endpoint Animals/animals: '+err);
+  });     
 })
 
-.controller('AnimalListCtrl2', function ($scope) {
-    $scope.animalListItems = [{
-        id: 1,
-        pretty_name: "Kangaroo"
-      },{
-        id:21,
-        pretty_name:"Wombat"
-      }];  
-})
+.controller('MapCtrl', function($scope, $cordovaGeolocation, $ionicLoading, $ionicPlatform, $ionicModal, mcsService) {
 
-.controller('AnimalListCtrl', function ($scope, $ionicModal) {
+  //init the modal
+  $ionicModal.fromTemplateUrl('modal.html', {
+    scope: $scope,
+    animation: 'slide-in-up'
+  }).then(function (modal) {
+    $scope.modal = modal;
+  });
 
-// array list which will contain the items added
-$scope.animalListItems = [];
+  // function to open the modal
+  $scope.openModal = function (id) {
+    $ionicLoading.show({
+      template: '<ion-spinner icon="bubbles"></ion-spinner><br/>Getting information'
+    });
+    mcsService.invokeCustomAPI("Animals/animals/" + id , "GET" , null)
+    .then (function(data) {
+      $ionicLoading.hide();                          
+      $scope.modal.animal = data;
+      $scope.modal.show();
+    })
+    .catch(function(err) {
+      $ionicLoading.hide();                          
+      console.log('Error calling endpoint Animals/animals: '+err);
+    });
 
-//init the modal
-$ionicModal.fromTemplateUrl('modal.html', {
-  scope: $scope,
-  animation: 'slide-in-up'
-}).then(function (modal) {
-  $scope.modal = modal;
-});
+  };
 
-// function to open the modal
-$scope.openModal = function () {
-  $scope.modal.show();
-};
+  // function to close the modal
+  $scope.closeModal = function () {
+    $scope.modal.hide();
+  };
 
-// function to close the modal
-$scope.closeModal = function () {
-  $scope.modal.hide();
-};
-
-//Cleanup the modal when we're done with it!
-$scope.$on('$destroy', function () {
-  $scope.modal.remove();
-});
-
-$scope.animalListItems = [{
-    id: 1,
-    pretty_name: "Kangaroo"
-  },{
-    id:21,
-    pretty_name:"Wombat"
-  }];  
-
-})
-
-.controller('MapCtrl', function($scope, $cordovaGeolocation, $ionicLoading, $ionicPlatform, $ionicModal) {
-     
+  //Cleanup the modal when we're done with it!
+  $scope.$on('$destroy', function () {
+    $scope.modal.remove();
+  });
     $ionicPlatform.ready(function() {
          
-        $ionicLoading.show({
-            template: '<ion-spinner icon="bubbles"></ion-spinner><br/>Acquiring location!'
-        });
-         
-        var posOptions = {
-            enableHighAccuracy: true,
-            timeout: 20000,
-            maximumAge: 0
-        };  
+      $scope.nearby_title = "Nothing nearby";
+      $scope.nearby_class = "bar-stable";
+      $ionicLoading.show({
+          template: '<ion-spinner icon="bubbles"></ion-spinner><br/>Acquiring location!'
+      });
+       
+      var posOptions = {
+          enableHighAccuracy: true,
+          timeout: 20000,
+          maximumAge: 0
+      };  
 
-        var image = 'img/ff000.png';      
+      var image = 'img/ff000.png';      
 
-        $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
-            var lat  = position.coords.latitude;
-            var long = position.coords.longitude;
-             
-            var latLong = new google.maps.LatLng(lat, long);
-             
-            var mapOptions = {
-                zoom: 25,
-                center: latLong,
-                streetViewControl: false,
-                draggable: false, 
-                zoomControl: false, 
-                scrollwheel: false, 
-                disableDoubleClickZoom: true,
-                clickableIcons: false,
-                disableDefaultUI : true,            
-                mapTypeId: 'terrain'
-            };                              
-             
-            var map = new google.maps.Map(document.getElementById("map"), mapOptions);          
-             
-            $scope.map = map;
-            $scope.map.data.loadGeoJson('geo/cct1.geojson');
-            $scope.map.data.loadGeoJson('geo/cct2.geojson');
-            
-            var marker = new google.maps.Marker({
-              position: latLong,
-              map: $scope.map,
-              icon: image
-            });                   
-            
-            $ionicLoading.hide();                          
-                  
-        }, function(err) {
-            $ionicLoading.hide();
-            console.log(err);
-        });
+      $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
+          var lat  = position.coords.latitude;
+          var lon = position.coords.longitude;
+          mcsService.invokeCustomAPI("Animals/animals/nearby?lat=" + lat + "&lon=" + lon , "GET" , null)
+          .then (function(data) {
+            if (data.length > 0) {
+              $scope.animals = data; 
+              $scope.nearby_title = "Something is nearby"
+              $scope.nearby_class = "bar-balanced"
+            } else {
+              $scope.nearby_title = "Nothing nearby";
+              $scope.nearby_class = "bar-stable";
+            }
+
+          })
+          .catch(function(err) {
+              console.log('Error calling endpoint Animals/animals/nearby: '+err);
+          });     
+          var latLong = new google.maps.LatLng(lat, lon);
+           
+          var mapOptions = {
+              zoom: 25,
+              center: latLong,
+              streetViewControl: false,
+              draggable: false, 
+              zoomControl: false, 
+              scrollwheel: false, 
+              disableDoubleClickZoom: true,
+              clickableIcons: false,
+              disableDefaultUI : true,            
+              mapTypeId: 'terrain'
+          };                              
+           
+          var map = new google.maps.Map(document.getElementById("map"), mapOptions);          
+           
+          $scope.map = map;
+          $scope.map.data.loadGeoJson('geo/cct1.geojson');
+          $scope.map.data.loadGeoJson('geo/cct2.geojson');
+          
+          var marker = new google.maps.Marker({
+            position: latLong,
+            map: $scope.map,
+            icon: image
+          });                   
+          
+          $ionicLoading.hide();                          
+                
+      }, function(err) {
+          $ionicLoading.hide();
+          console.log(err);
+      });
     });               
 });

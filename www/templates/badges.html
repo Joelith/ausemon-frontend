@@ -1,0 +1,14 @@
+<ion-view view-title="Badges">
+  <ion-content>
+    <ion-list id="badges-list1" class=" ">
+	  <ion-item ng-repeat="badge in badges" id="animals-list-item4"
+	    class="  ">
+	    <ion-avatar item-left>
+	    	<img src="img/badge_{{badge.id}}.jpg">
+	    </ion-avatar>
+	    <h2>{{badge.name}}</h2>
+	    <p>{{badge.description}}</p>
+	  </ion-item>
+	</ion-list>
+  </ion-content>
+</ion-view>
