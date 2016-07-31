@@ -8,7 +8,8 @@ var $ = window.$
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.controllers'])
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, mcsService) {
+
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -24,14 +25,31 @@ angular.module('starter', ['ionic', 'starter.controllers'])
   });
 })
 
+
 .config(function($stateProvider, $urlRouterProvider) {
+  var authenticated = function ($q, mcsService) {
+    var deferred = $q.defer();
+    if (mcsService.isLoggedIn()) {
+      deferred.resolve();
+    } else {
+      mcsService.authenticateAnonymous().then(function () {
+        deferred.resolve();
+      }).catch(function(err) {
+        deferred.reject();
+      })
+    }
+    return deferred.promise;
+  };
+  
   $stateProvider
 
   .state('app', {
     url: '/app',
     abstract: true,
     templateUrl: 'templates/menu.html',
-    controller: 'AppCtrl'
+    controller: 'AppCtrl',
+            resolve : {authenticated : authenticated }
+
   })
 
   .state('app.map', {
@@ -39,7 +57,7 @@ angular.module('starter', ['ionic', 'starter.controllers'])
     views: {
       'menuContent': {
         templateUrl: 'templates/map.html',
-        controller: 'MapCtrl'
+        controller: 'MapCtrl',
       }
     }
   })

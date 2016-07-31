@@ -46,6 +46,9 @@ angular.module('app.services', [])
       , function(statusCode,data) {deferred.reject(statusCode,data)});         
       return deferred.promise;
    };
+   var isLoggedIn = function () {
+    return mbe.Authorization.getIsAuthorized();
+   }
 
   var invokeCustomAPI = function(uri,method,payload) {
     console.log('INVOKE');
@@ -56,10 +59,52 @@ angular.module('app.services', [])
     return deferred.promise;
   };
 
+  var invokeLocationAPI = function(uri,method,payload) {
+    console.log('LOCATION');
+    var deferred = $q.defer();
+    mbe.CustomCode.invokeLocationAPI(uri , method , payload
+      , function(statusCode,data) {deferred.resolve(data)}
+      , function(statusCode,data) {deferred.reject(statusCode,data)});         
+    return deferred.promise;
+  };
+
+  var logStartSessionEvent = function() {
+      mbe.Analytics.startSession();
+  }
+   
+  var logEndSessionEvent = function() {
+      mbe.Analytics.endSession();
+  }
+   
+  var logCustomEvent = function(eventName, properties) {
+      var event = new mcs.AnalyticsEvent(eventName);
+      event.properties = properties;
+      mbe.Analytics.logEvent(event);
+  }
+   
+  var flushAnalyticsEvents = function() {
+      mbe.Analytics.flush();
+  }
+
+  var setLatLon = function (lat, lon) {
+    context = mbe.Analytics._createContextEvent();
+    context.properties.latitude = lat;
+    context.properties.longitude = lon;
+    mbe.Analytics._events[0] = context;
+  }
+   
+
    return {
-     authenticate:authenticate,
-     authenticateAnonymous:authenticateAnonymous,
-     logout:logout,
-     invokeCustomAPI:invokeCustomAPI
+    authenticate:authenticate,
+    authenticateAnonymous:authenticateAnonymous,
+    logout:logout,
+    invokeCustomAPI:invokeCustomAPI,
+    invokeLocationAPI: invokeLocationAPI,
+    logStartSessionEvent:logStartSessionEvent,
+    logEndSessionEvent: logEndSessionEvent,
+    logCustomEvent:logCustomEvent,
+    flushAnalyticsEvents:flushAnalyticsEvents,
+    setLatLon:setLatLon,
+    isLoggedIn:isLoggedIn
   }
 });
