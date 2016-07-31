@@ -124,20 +124,25 @@ angular.module('starter.controllers', ['app.services', 'ngCordova'])
           lat  = position.coords.latitude;
           lon = position.coords.longitude;
           mcsService.setLatLon(String(lat), String(lon));
-          mcsService.invokeLocationAPI("location/places/query", "POST", {
-            inGeoFence: {
-              gpsCircle : {
-                latitude  : lat,
-                longitude : lon,
-                radius    : 2000
-              }
-            },
-            limit : 1 
+          // This doesn't work. Just fake
+          mcsService.logCustomEvent('trail-section',{
+            section : String(Math.floor(Math.random() * 7) + 1) 
+          });
+          mcsService.flushAnalyticsEvents();
+
+          /*mcsService.invokeLocationAPI("location/places/query", "POST", {
+            nearestTo : {
+              gpsPoint : {
+                latitude : lat,
+                longitude : lon
+              },
+              format: 'short'
+            }
           }).then(function (data) {
             console.log('data', data);
           }).catch(function(err) {
             console.log("Error calling places api" + err);
-          });
+          });*/
           mcsService.invokeCustomAPI("Animals/animals/nearby?lat=" + lat + "&lon=" + lon , "GET" , null)
           .then (function(data) {
             if (data.length > 0) {
