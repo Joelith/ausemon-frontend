@@ -1,5 +1,4 @@
-## IonicGeolocationDemo
+# ausemon-frontend
+Ionic-based UI for the Ausemon app.
 
-This is Ionic Framework Google Maps demo application made for blog article: http://www.gajotres.net/using-cordova-geoloacation-api-with-google-maps-in-ionic-framework/
-
-
+This was built at GovHack Canberra July 2016 by Team rgb(255,0,0)
