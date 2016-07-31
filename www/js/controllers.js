@@ -118,6 +118,7 @@ angular.module('starter.controllers', ['app.services', 'ngCordova'])
       $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
           var lat  = position.coords.latitude;
           var lon = position.coords.longitude;
+        
           mcsService.invokeCustomAPI("Animals/animals/nearby?lat=" + lat + "&lon=" + lon , "GET" , null)
           .then (function(data) {
             if (data.length > 0) {
@@ -133,19 +134,73 @@ angular.module('starter.controllers', ['app.services', 'ngCordova'])
           .catch(function(err) {
               console.log('Error calling endpoint Animals/animals/nearby: '+err);
           });     
-          var latLong = new google.maps.LatLng(lat, lon);
-           
+
+          //var latLong = new google.maps.LatLng(lat, lon);
+          var latLong = new google.maps.LatLng(-35.311516972985451, 149.1212274874590);
+          
+          var styles = [
+            {
+              "stylers": [
+                { "visibility": "simplified" }
+              ]
+            },{
+              "stylers": [
+                { "saturation": 72 },
+                { "hue": "#004cff" }
+              ]
+            },{
+              "featureType": "road",
+              "stylers": [
+                { "visibility": "simplified" }
+              ]
+            },{
+              "featureType": "poi",
+              "elementType": "labels",
+              "stylers": [
+                { "visibility": "off" }
+              ]
+            },{
+              "featureType": "road",
+              "elementType": "labels",
+              "stylers": [
+                { "visibility": "off" }
+              ]
+            },{
+              "featureType": "landscape",
+              "elementType": "labels",
+              "stylers": [
+                { "visibility": "off" }
+              ]
+            },{
+              "featureType": "administrative",
+              "elementType": "labels.text",
+              "stylers": [
+                { "visibility": "off" }
+              ]
+            },{
+              "featureType": "water",
+              "elementType": "labels",
+              "stylers": [
+                { "visibility": "off" }
+              ]
+            },{
+              "featureType": "transit",
+              "elementType": "labels",
+              "stylers": [
+                { "visibility": "off" }
+              ]
+            },{
+            }
+          ]
+
           var mapOptions = {
-              zoom: 25,
+              zoom: 15,
               center: latLong,
               streetViewControl: false,
-              draggable: false, 
               zoomControl: false, 
-              scrollwheel: false, 
-              disableDoubleClickZoom: true,
               clickableIcons: false,
               disableDefaultUI : true,            
-              mapTypeId: 'terrain'
+              styles: styles
           };                              
            
           var map = new google.maps.Map(document.getElementById("map"), mapOptions);          
@@ -156,10 +211,11 @@ angular.module('starter.controllers', ['app.services', 'ngCordova'])
           
           var marker = new google.maps.Marker({
             position: latLong,
+            label: '#ff000',            
             map: $scope.map,
-            icon: image
-          });                   
-          
+            draggable: true
+          });         
+      
           $ionicLoading.hide();                          
                 
       }, function(err) {

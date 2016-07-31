@@ -15,3 +15,8 @@ ion-avatar {
     max-width: 3.6rem;
     max-height: 3.6rem;
     border-radius: 1.8rem; }
+
+div#myDiv {
+    -webkit-transform: rotateX(50deg); /* Safari */
+    transform: rotateX(50deg); /* Standard syntax */
+}

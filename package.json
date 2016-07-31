@@ -1,7 +1,7 @@
 {
-  "name": "ausemon",
+  "name": "Ausémon",
   "version": "1.1.1",
-  "description": "ausemon: An Ionic project",
+  "description": "Ausémon - Gotta See 'Em All",
   "dependencies": {
     "gulp": "^3.5.6",
     "gulp-sass": "^2.0.4",
@@ -23,6 +23,6 @@
     "ionic-plugin-keyboard"
   ],
   "cordovaPlatforms": [
-    "ios"
+    "android"
   ]
 }
