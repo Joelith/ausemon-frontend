@@ -121,6 +121,10 @@ angular.module('starter.controllers', ['app.services', 'ngCordova'])
       var image = 'img/ff000.png';      
 
       $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
+
+          lat  = position.coords.latitude;
+          lon = position.coords.longitude;
+        
           mcsService.invokeCustomAPI("Animals/animals/nearby?lat=" + lat + "&lon=" + lon , "GET" , null)
           .then (function(data) {
             if (data.length > 0) {
