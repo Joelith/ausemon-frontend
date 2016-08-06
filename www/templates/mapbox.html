@@ -1,8 +1,44 @@
 <ion-view view-title="Ausémon - Gotta See 'Em All">
 	<ion-content>
+	<button class="button demoBtn" ng-click="demoMap()">Demo</button>
+
 		<div id="map" data-tap-disabled="true"></div>
-		<div class="pin-bottom">
-			<div class="marker"/>
-		</div>
+		<div class="bar bar-footer {{nearby_class}}">
+  		<div class="title">{{nearby_title}}</div>
+	</div>
+	<ion-list>
+		<ion-item ng-repeat="item in animals" ng-click="openModal({{item.id}})" class="item item-avatar">
+			<img src="img/animals/thumbs/{{item.id}}.jpg">
+			<h2>{{item.name}}</h2>
+      		<p>{{item.distance}} metres away</p>
+		</ion-item>
+	</ion-list>			
 	</ion-content>
 </ion-view>
+
+<script id="modal.html" type="text/ng-template">
+	<div class="modal">
+		<ion-header-bar class="bar-positive" align-title="center">
+							<h1 class="title">{{modal.animal.name}}</h1>
+							<a class="button" ng-click="closeModal()">Cancel</a>
+		</ion-header-bar>
+		<ion-content>
+			<div class="list card">
+
+				<div class="item item-avatar">
+					<img src="img/animals/thumbs/{{modal.animal.id}}.jpg">
+					<h2>{{modal.animal.name}}</h2>
+					<p></p>
+				</div>
+
+				<div class="item item-body">
+					<img class="full-image" src="img/animals/thumbs/{{modal.animal.id}}.jpg">
+					<p>
+					{{modal.animal.description}}
+					</p>
+				</div>
+
+			</div>
+		</ion-content>
+	</div>
+</script>

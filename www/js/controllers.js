@@ -61,10 +61,13 @@ angular.module('starter.controllers', ['app.services', 'ngCordova'])
       console.log('Error calling endpoint Animals/animals: '+err);
   });     
 })
+.controller('MapBoxCtrl', function($scope, $ionicLoading, $cordovaGeolocation, $ionicModal, mcsService) {
+  $scope.nearby_title = "Nothing nearby";
+  $scope.nearby_class = "bar-stable";
+  $ionicLoading.show({
+      template: '<ion-spinner icon="bubbles"></ion-spinner><br/>Keep your eyes open, <br/>you might miss something!'
+  });
 
-.controller('MapCtrl', function($scope, $cordovaGeolocation, $ionicLoading, $ionicPlatform, $ionicModal, mcsService) {
-
-  var lat, lon;
   //init the modal
   $ionicModal.fromTemplateUrl('modal.html', {
     scope: $scope,
@@ -104,186 +107,78 @@ angular.module('starter.controllers', ['app.services', 'ngCordova'])
   $scope.$on('$destroy', function () {
     $scope.modal.remove();
   });
-    $ionicPlatform.ready(function() {
-         
-      $scope.nearby_title = "Nothing nearby";
-      $scope.nearby_class = "bar-stable";
-      $ionicLoading.show({
-          template: '<ion-spinner icon="bubbles"></ion-spinner><br/>Keep your eyes open, <br/>you might miss something!'
-      });
-       
-      var posOptions = {
-          enableHighAccuracy: true,
-          timeout: 20000,
-          maximumAge: 0
-      };  
 
-      var image = 'img/ff000.png';      
+  var moveMap = function (lat, lon) {
+      mcsService.invokeCustomAPI("Animals/animals/nearby?lat=" + lat + "&lon=" + lon , "GET" , null)
+    .then (function(data) {
+      if (data.length > 0) {
+        $scope.animals = data; 
+        $scope.nearby_title = "Something is nearby"
+        $scope.nearby_class = "bar-balanced"
+      } else {
+        $scope.nearby_title = "Nothing nearby";
+        $scope.nearby_class = "bar-stable";
+      }
+    })
+    .catch(function(err) {
+        console.log('Error calling endpoint Animals/animals/nearby: '+err);
+    }); 
+    marker.setLngLat([lon,lat]);  
+    if (!marker_added_to_map) marker.addTo(map);
 
-      $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
+    map.setCenter([lon, lat]);
 
-          lat  = position.coords.latitude;
-          lon = position.coords.longitude;
-        
-          mcsService.invokeCustomAPI("Animals/animals/nearby?lat=" + lat + "&lon=" + lon , "GET" , null)
-          .then (function(data) {
-            if (data.length > 0) {
-              $scope.animals = data; 
-              $scope.nearby_title = "Something is nearby"
-              $scope.nearby_class = "bar-balanced"
-            } else {
-              $scope.nearby_title = "Nothing nearby";
-              $scope.nearby_class = "bar-stable";
-            }
-
-          })
-          .catch(function(err) {
-              console.log('Error calling endpoint Animals/animals/nearby: '+err);
-          });     
-
-          //var latLong = new google.maps.LatLng(lat, lon);
-          var latLong = new google.maps.LatLng(-35.311516972985451, 149.1212274874590);
-          
-          var styles = [
-            {
-              "stylers": [
-                { "visibility": "simplified" }
-              ]
-            },{
-              "stylers": [
-                { "saturation": 72 },
-                { "hue": "#004cff" }
-              ]
-            },{
-              "featureType": "road",
-              "stylers": [
-                { "visibility": "simplified" }
-              ]
-            },{
-              "featureType": "poi",
-              "elementType": "labels",
-              "stylers": [
-                { "visibility": "off" }
-              ]
-            },{
-              "featureType": "road",
-              "elementType": "labels",
-              "stylers": [
-                { "visibility": "off" }
-              ]
-            },{
-              "featureType": "landscape",
-              "elementType": "labels",
-              "stylers": [
-                { "visibility": "off" }
-              ]
-            },{
-              "featureType": "administrative",
-              "elementType": "labels.text",
-              "stylers": [
-                { "visibility": "off" }
-              ]
-            },{
-              "featureType": "water",
-              "elementType": "labels",
-              "stylers": [
-                { "visibility": "off" }
-              ]
-            },{
-              "featureType": "transit",
-              "elementType": "labels",
-              "stylers": [
-                { "visibility": "off" }
-              ]
-            },{
-            }
-          ]
-
-          var mapOptions = {
-              zoom: 15,
-              center: latLong,
-              streetViewControl: false,
-              zoomControl: false, 
-              clickableIcons: false,
-              disableDefaultUI : true,            
-              styles: styles
-          };                              
-           
-          var map = new google.maps.Map(document.getElementById("map"), mapOptions);          
-           
-          $scope.map = map;
-          $scope.map.data.loadGeoJson('geo/cct1.geojson');
-          $scope.map.data.loadGeoJson('geo/cct2.geojson');
-          
-          var marker = new google.maps.Marker({
-            position: latLong,
-            label: '#ff000',            
-            map: $scope.map,
-            draggable: true
-          });         
-      
-          $ionicLoading.hide();                          
-                
-      }, function(err) {
-          $ionicLoading.hide();
-          console.log(err);
-      });
-    });               
-})
-.controller('MapBoxCtrl', function($scope) {
+  }
   mapboxgl.accessToken = 'pk.eyJ1Ijoiam9lbGl0aCIsImEiOiJjaXJoMTRrcG4wMWIzZnlreGo1ZnhtN3psIn0.phwvU2Rgcy-oa8n-hZx16A';
   var map = new mapboxgl.Map({
     container : 'map',
     style: 'mapbox://styles/joelith/cirh1bcq00003gfnev58pm1de',
     center: [149.091, -35.2438],
-    zoom: 16,
-    bearing: -9.47,
+    zoom: 14,
+    bearing: -60,
     pitch : 75.00
+  });
+  // Prepare the marker
+  var el = document.createElement('span');
+  el.className = 'map-icon map-icon-trail-walking';
+  el.style['font-size'] = '30pt';
+  var marker = new mapboxgl.Marker(el);
+  var marker_added_to_map = false;
+ 
+  var watch = $cordovaGeolocation.watchPosition({
+    timeout : 3000,
+    enableHighAccuracy : true
+  });
+  watch.then(null, function (error) {
+    console.log('Error getting position', error);
+  }, function (position) {
+    moveMap(position.coords.latitude, position.coords.longitude)
   });
 
   map.on('load', function () {
-    map.addSource('points', {
-      type : 'geojson',
-      data : {
-        type : 'FeatureCollection',
-        features: [{
-          type: 'Feature',
-          geometry: {
-            type: "Point",
-            coordinates: [149.091, -35.2438]
-          },
-          properties: {
-            title: "Mapbox DC",
-            icon: "circle"
-          }
-        }]
-      }
-    });
-      map.addLayer({
-        id: "markers",
-        type: "symbol",
-        source: "points",
-        layout: {
-            "icon-image": "{icon}-15"
-        }
-    });
-  })
-
-
-  /*map.boxZoom.disable();
+    $ionicLoading.hide();                          
+  });
+ 
+  map.boxZoom.disable();
   map.dragPan.disable();
   map.doubleClickZoom.disable();
   map.scrollZoom.disable();
   map.keyboard.disable();
-  map.touchZoomRotate.disable();*/
+  map.touchZoomRotate.disable();
 
-  var geolocate = new mapboxgl.Geolocate({position: 'top-right' });
-  map.addControl(geolocate);
 
-  geolocate.on('geolocate', function() {
-    // Apparently this get's reset on result :/
-    map.setBearing(-9.47);
-    map.setPitch(45.00);
-  });
-
+  $scope.demoMap = function () {
+    var positions = [
+      [-35.246765, 149.090998],
+      [-35.248438, 149.090526],
+      [-35.249078, 149.092849],
+      [-35.250900, 149.093852]
+    ];
+    var i = 0, l = positions.length;
+    (function iterator() {
+      console.log('moving map to', positions);
+      moveMap(positions[i][0], positions[i][1]);
+      if (++i<l) setTimeout(iterator, 10000)
+    })();
+  }
 });
