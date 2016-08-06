@@ -52,7 +52,7 @@ angular.module('starter', ['ionic', 'starter.controllers'])
 
   })
 
-  .state('app.map', {
+  /*.state('app.map', {
     url: '/map',
     views: {
       'menuContent': {
@@ -60,7 +60,17 @@ angular.module('starter', ['ionic', 'starter.controllers'])
         controller: 'MapCtrl',
       }
     }
+  })*/
+  .state('app.map', {
+    url: '/map',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/mapbox.html',
+        controller: 'MapBoxCtrl',
+      }
+    }
   })
+
 
   .state('app.animals', {
     url: '/animals',
@@ -99,5 +109,5 @@ angular.module('starter', ['ionic', 'starter.controllers'])
     }
   })
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/app/map');
+  $urlRouterProvider.otherwise('/app');
 });

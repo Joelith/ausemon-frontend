@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
-    <meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *">
+    <meta http-equiv="Content-Security-Policy" content="default-src * data: blob:; script-src * 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *">
     <title></title>
 
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
@@ -26,11 +26,16 @@
     <script src="js/app.js"></script>
     <script src="js/controllers.js"></script>
     <script src="js/services.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIuwyAYxht0OJaofeKldLypiVk7fK6_Go"></script>
+   <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIuwyAYxht0OJaofeKldLypiVk7fK6_Go"></script>-->
+
+    <script src="https://api.mapbox.com/mapbox-gl-js/v0.21.0/mapbox-gl.js"></script>
+    <!--<script src="lib/mapgl.js"></script>-->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v0.21.0/mapbox-gl.css" rel="stylesheet"/>
     
     <script type="text/ng-template" id="modalWrapper.html">
       <ion-modal-view id="modal"class="modal"></ion-modal-view>
     </script>
+
 
     <script type="text/ng-template" id="modalOne.html">
           <ion-header-bar class="bar-positive" align-title="center">

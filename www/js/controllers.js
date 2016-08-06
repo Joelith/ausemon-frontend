@@ -225,4 +225,61 @@ angular.module('starter.controllers', ['app.services', 'ngCordova'])
           console.log(err);
       });
     });               
+})
+.controller('MapBoxCtrl', function($scope) {
+  mapboxgl.accessToken = 'pk.eyJ1Ijoiam9lbGl0aCIsImEiOiJjaXJoMTRrcG4wMWIzZnlreGo1ZnhtN3psIn0.phwvU2Rgcy-oa8n-hZx16A';
+  var map = new mapboxgl.Map({
+    container : 'map',
+    style: 'mapbox://styles/joelith/cirh1bcq00003gfnev58pm1de',
+    center: [149.091, -35.2438],
+    zoom: 16,
+    bearing: -9.47,
+    pitch : 75.00
+  });
+
+  map.on('load', function () {
+    map.addSource('points', {
+      type : 'geojson',
+      data : {
+        type : 'FeatureCollection',
+        features: [{
+          type: 'Feature',
+          geometry: {
+            type: "Point",
+            coordinates: [149.091, -35.2438]
+          },
+          properties: {
+            title: "Mapbox DC",
+            icon: "circle"
+          }
+        }]
+      }
+    });
+      map.addLayer({
+        id: "markers",
+        type: "symbol",
+        source: "points",
+        layout: {
+            "icon-image": "{icon}-15"
+        }
+    });
+  })
+
+
+  /*map.boxZoom.disable();
+  map.dragPan.disable();
+  map.doubleClickZoom.disable();
+  map.scrollZoom.disable();
+  map.keyboard.disable();
+  map.touchZoomRotate.disable();*/
+
+  var geolocate = new mapboxgl.Geolocate({position: 'top-right' });
+  map.addControl(geolocate);
+
+  geolocate.on('geolocate', function() {
+    // Apparently this get's reset on result :/
+    map.setBearing(-9.47);
+    map.setPitch(45.00);
+  });
+
 });

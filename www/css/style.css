@@ -20,3 +20,16 @@ div#myDiv {
     -webkit-transform: rotateX(50deg); /* Safari */
     transform: rotateX(50deg); /* Standard syntax */
 }
+
+.pin-bottom { right:0; bottom:0; left:0; }
+
+.marker {
+  position: absolute;
+  width: 20px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #005773;
+  opacity: .2;
+  top: 180px;
+  left: 60px;
+}
