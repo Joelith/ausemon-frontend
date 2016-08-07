@@ -64,6 +64,7 @@ angular.module('starter.controllers', ['app.services', 'ngCordova'])
 .controller('MapBoxCtrl', function($scope, $ionicLoading, $cordovaGeolocation, $ionicModal, mcsService) {
   $scope.nearby_title = "Nothing nearby";
   $scope.nearby_class = "bar-stable";
+  $scope.animals = [];
   $ionicLoading.show({
       template: '<ion-spinner icon="bubbles"></ion-spinner><br/>Keep your eyes open, <br/>you might miss something!'
   });
